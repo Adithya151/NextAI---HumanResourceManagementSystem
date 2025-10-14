@@ -1,0 +1,259 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Admin Control Center{% endblock %}
+
+{% block content %}
+<style>
+    /* --- Main Dashboard Layout: 3 Columns (2 for content, 1 for sidebar) --- */
+    .admin-dashboard-layout {
+        display: grid;
+        grid-template-columns: 1fr 1fr 320px; /* Main content + fixed sidebar */
+        gap: 30px;
+        align-items: flex-start;
+    }
+    .main-content {
+        grid-column: 1 / 3; /* Span first two columns */
+        display: grid;
+        gap: 30px;
+        grid-template-columns: 1fr 1fr; /* Inner grid for content */
+    }
+
+    /* --- Frosted Glass Sidebar (Glassmorphism) --- */
+    .sidebar-panel {
+        grid-column: 3 / 4;
+        position: sticky;
+        top: 100px; /* Offset from the navbar */
+        background: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px); /* For Safari */
+        border-radius: 16px;
+        padding: 25px;
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        box-shadow: 0 8px 32px 0 rgba(106, 90, 205, 0.15);
+    }
+    .sidebar-panel h3 {
+        margin-top: 0;
+    }
+
+    /* --- General Elements --- */
+    .dashboard-header {
+        grid-column: 1 / -1; /* Span all columns in its grid */
+    }
+    .section-title {
+        grid-column: 1 / -1;
+        margin-bottom: -10px;
+    }
+    .dashboard-card {
+        background: var(--white-color);
+        padding: 30px;
+        border-radius: 16px;
+        box-shadow: var(--shadow-lg);
+    }
+
+    /* --- Stat Cards with Gradient --- */
+    .stats-grid {
+        grid-column: 1 / -1;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+    }
+    .stat-card {
+        padding: 25px;
+        border-radius: 12px;
+        color: var(--white-color);
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.3s ease;
+    }
+    .stat-card:hover { transform: translateY(-5px); }
+    .stat-card .icon { font-size: 2.5em; position: absolute; right: 20px; top: 20px; opacity: 0.3; }
+    .stat-card .label { font-size: 1rem; opacity: 0.9; }
+    .stat-card .number { font-size: 2.5em; font-weight: 700; line-height: 1.2; }
+    
+    /* Gradient backgrounds for Stat Cards */
+    .stat-card.c1 { background: linear-gradient(135deg, #6a5acd, #8374d4); }
+    .stat-card.c2 { background: linear-gradient(135deg, #2ecc71, #53d68a); }
+    .stat-card.c3 { background: linear-gradient(135deg, #f1c40f, #f3d051); }
+    .stat-card.c4 { background: linear-gradient(135deg, #e74c3c, #ec7063); }
+    
+    /* --- Line Chart Card --- */
+    .chart-card { grid-column: 1 / -1; }
+
+    /* --- Pending Requests & Actions Cards --- */
+    .pending-requests-card { grid-column: 1 / 3; } /* Span both columns */
+    .actions-grid { grid-column: 1 / -1; } /* On their own row */
+
+    /* --- Sidebar Activity Feed --- */
+    .activity-feed { list-style: none; padding: 0; margin: 0; }
+    .activity-item { display: flex; align-items: flex-start; gap: 15px; padding: 12px 0; border-bottom: 1px solid rgba(0,0,0,0.05); }
+    .activity-item:last-child { border: none; }
+    .activity-icon { font-size: 1.5rem; flex-shrink: 0; width: 30px; text-align: center; }
+    .activity-text small { color: #6b7280; display: block; }
+    .activity-icon.user-add { color: #2ecc71; }
+    .activity-icon.report-gen { color: #3498db; }
+    .activity-icon.leave-approved { color: #f1c40f; }
+
+    /* Responsive adjustments */
+    @media (max-width: 1200px) {
+        .admin-dashboard-layout { grid-template-columns: 1fr; }
+        .sidebar-panel { grid-row: 1; margin-bottom: 30px; position: static; }
+        .main-content { grid-column: 1 / -1; }
+    }
+    @media (max-width: 768px) {
+        .stats-grid, .main-content { grid-template-columns: 1fr; }
+        .pending-requests-card { grid-column: 1 / -1; }
+    }
+</style>
+
+<div class="admin-dashboard-layout">
+    <!-- MAIN CONTENT AREA -->
+    <div class="main-content">
+        <div class="dashboard-header fade-in">
+            <h1>Admin Control Center</h1>
+            <p>Welcome, {{ user.first_name|default:user.username }}. Here is your system-wide overview.</p>
+        </div>
+
+        <!-- STATS GRID -->
+        <div class="stats-grid">
+            <div class="stat-card c1 fade-in" style="transition-delay: 100ms;">
+                <div class="icon"><i class='bx bx-group'></i></div>
+                <div class="label">Total Employees</div>
+                <div class="number">{{ total_employees }}</div>
+            </div>
+            <div class="stat-card c2 fade-in" style="transition-delay: 200ms;">
+                <div class="icon"><i class='bx bx-check-circle'></i></div>
+                <div class="label">Present Today</div>
+                <div class="number">{{ present_today }}</div>
+            </div>
+            <div class="stat-card c3 fade-in" style="transition-delay: 300ms;">
+                <div class="icon"><i class='bx bx-sun'></i></div>
+                <div class="label">On Leave Today</div>
+                <div class="number">{{ on_leave_today }}</div>
+            </div>
+            <div class="stat-card c4 fade-in" style="transition-delay: 400ms;">
+                <div class="icon"><i class='bx bx-envelope'></i></div>
+                <div class="label">Pending Requests</div>
+                <div class="number">{{ pending_requests_count }}</div>
+            </div>
+        </div>
+        
+        <!-- EMPLOYEE GROWTH CHART -->
+        <div class="dashboard-card chart-card fade-in" style="transition-delay: 500ms;">
+            <div class="dashboard-card-header">
+                <h3>Employee Growth (Last 6 Months)</h3>
+            </div>
+            <canvas id="employeeGrowthChart"></canvas>
+        </div>
+
+        <!-- PENDING REQUESTS -->
+        <div class="dashboard-card pending-requests-card fade-in" style="transition-delay: 600ms;">
+            <div class="dashboard-card-header">
+                <h3>Action Required: Pending Requests</h3>
+                <a href="{% url 'manage_leave_requests' %}">View All</a>
+            </div>
+            <table>
+                <tbody>
+                    {% for req in pending_requests|slice:":3" %} {# Show top 3 #}
+                    <tr>
+                        <td><strong>{{ req.user.get_full_name }}</strong><br><small>{{ req.get_leave_type_display }}</small></td>
+                        <td>{{ req.start_date|date:"M d" }} → {{ req.end_date|date:"M d" }}</td>
+                        <td>
+                            <a href="#" class="btn btn-sm btn-deny">Deny</a>
+                            <a href="#" class="btn btn-sm btn-approve">Approve</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="3" style="text-align:center; padding: 20px;">No pending requests. All clear! 🎉</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- CORE MANAGEMENT ACTIONS -->
+        <h2 class="section-title fade-in">Core Management</h2>
+        <div class="main-content actions-grid"> {# Re-using main-content grid for actions #}
+            <div class="action-card fade-in" style="transition-delay: 700ms;">
+                <div class="icon"><i class='bx bx-user-detail'></i></div>
+                <h3>Employee Management</h3><p>View, add, or manage all employee profiles.</p>
+                <a href="{% url 'employee_list' %}" class="btn">Manage Employees</a>
+            </div>
+            <div class="action-card fade-in" style="transition-delay: 800ms;">
+                <div class="icon"><i class='bx bx-dollar-circle'></i></div>
+                <h3>Payroll Processing</h3><p>Manage and process monthly payroll for all staff.</p>
+                <a href="{% url 'payroll_list' %}" class="btn">Process Payroll</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- GLASSMORPHISM SIDEBAR -->
+    <div class="sidebar-panel fade-in" style="transition-delay: 600ms;">
+        <h3>System Activity</h3>
+        <ul class="activity-feed">
+            <li class="activity-item">
+                <div class="activity-icon user-add"><i class='bx bx-user-plus'></i></div>
+                <div class="activity-text">
+                    <strong>New User Onboarded</strong>
+                    <small>Maria Garcia has joined the Engineering team. <br>2 min ago</small>
+                </div>
+            </li>
+            <li class="activity-item">
+                <div class="activity-icon report-gen"><i class='bx bx-file'></i></div>
+                <div class="activity-text">
+                    <strong>Report Generated</strong>
+                    <small>Q3 Attendance Report was successfully created. <br>15 min ago</small>
+                </div>
+            </li>
+            <li class="activity-item">
+                <div class="activity-icon leave-approved"><i class='bx bx-check-double'></i></div>
+                <div class="activity-text">
+                    <strong>Leave Approved</strong>
+                    <small>John Doe's vacation request was approved. <br>1 hour ago</small>
+                </div>
+            </li>
+            <li class="activity-item">
+                <div class="activity-icon user-add"><i class='bx bx-user-plus'></i></div>
+                <div class="activity-text">
+                    <strong>New User Onboarded</strong>
+                    <small>David Smith has joined the Sales team. <br>3 hours ago</small>
+                </div>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('employeeGrowthChart').getContext('2d');
+    const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim();
+    const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+    gradient.addColorStop(0, `${primaryColor}66`);
+    gradient.addColorStop(1, `${primaryColor}00`);
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            // Replace these with data from your Django view
+            labels: ['May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
+            datasets: [{
+                label: 'Total Employees',
+                data: [95, 102, 105, 115, 120, 124],
+                backgroundColor: gradient,
+                borderColor: primaryColor,
+                borderWidth: 3,
+                pointBackgroundColor: primaryColor,
+                pointRadius: 5,
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: false } }
+        }
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Attendance Confirmed{% endblock %}
+
+{% block content %}
+<style>
+/* A more engaging background for the page */
+body {
+    background: #f0f2f5; /* Light gray background to make the card pop */
+}
+
+/* Container to center the box and manage animations */
+.confirmation-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+    padding: 20px;
+}
+
+.confirmation-box {
+    text-align: center;
+    background: #ffffff;
+    padding: 40px 50px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    max-width: 500px;
+    width: 100%;
+    border: 1px solid #e5e7eb;
+    /* The main animation for the box itself */
+    animation: popIn 0.6s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+    opacity: 0;
+}
+
+/* The animated success icon */
+.success-animation {
+    margin: 0 auto 25px auto;
+}
+.checkmark {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    display: block;
+    stroke-width: 3;
+    stroke: #fff;
+    stroke-miterlimit: 10;
+    box-shadow: inset 0px 0px 0px #4bb71b;
+    animation: fill .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both;
+    margin: 0 auto;
+}
+.checkmark__circle {
+    stroke-dasharray: 166;
+    stroke-dashoffset: 166;
+    stroke-width: 3;
+    stroke-miterlimit: 10;
+    stroke: #4bb71b;
+    fill: none;
+    animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+}
+.checkmark__check {
+    transform-origin: 50% 50%;
+    stroke-dasharray: 48;
+    stroke-dashoffset: 48;
+    animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+}
+
+/* Keyframes for the icon animation */
+@keyframes stroke {
+    100% { stroke-dashoffset: 0; }
+}
+@keyframes scale {
+    0%, 100% { transform: none; }
+    50% { transform: scale3d(1.1, 1.1, 1); }
+}
+@keyframes fill {
+    100% { box-shadow: inset 0px 0px 0px 50px #4bb71b; }
+}
+
+/* Staggered animation for the text content */
+.confirmation-box h2, .confirmation-box p, .confirmation-box .button-group {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInText 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.confirmation-box h2 {
+    color: #1a202c;
+    font-size: 2em;
+    font-weight: 700;
+    margin-bottom: 15px;
+    animation-delay: 1s;
+}
+
+.confirmation-box p {
+    color: #4a5568;
+    font-size: 1.1em;
+    margin-bottom: 30px;
+    animation-delay: 1.2s;
+}
+
+/* Styling for the button group */
+.button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Creates space between buttons */
+    align-items: center;
+    animation-delay: 1.4s;
+}
+
+/* Modern Button Styles */
+.btn {
+    display: inline-block;
+    width: 100%; /* Make buttons full width of the container */
+    max-width: 280px;
+    padding: 14px 24px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 1em;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background: var(--primary-color, #3B82F6); /* Use your primary color, with a fallback */
+    color: #fff;
+    box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.39);
+}
+.btn-primary:hover {
+    background: var(--secondary-color, #2563EB);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px 0 rgba(59, 130, 246, 0.5);
+}
+
+.btn-secondary {
+    background: #e2e8f0;
+    color: #4a5568;
+}
+.btn-secondary:hover {
+    background: #cbd5e1;
+    color: #2d3748;
+    transform: translateY(-2px);
+}
+
+/* Keyframe for the main box pop-in effect */
+@keyframes popIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* Keyframe for the text fade-in effect */
+@keyframes fadeInText {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
+
+<div class="confirmation-container">
+    <div class="confirmation-box">
+        <div class="success-animation">
+            <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none" />
+                <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+            </svg>
+        </div>
+        <h2>{{ message }}</h2>
+        <p>Your record has been saved successfully. You can review your attendance history at any time.</p>
+        <div class="button-group">
+            <a href="{% url 'attendance_report' %}" class="btn btn-primary">View Attendance Report</a>
+            <a href="{% url 'dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

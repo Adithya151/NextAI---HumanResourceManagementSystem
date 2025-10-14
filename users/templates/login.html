@@ -1,0 +1,406 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Login | AI-HRMS{% endblock %}
+
+{% block content %}
+<style>
+    /* 
+    =========================================
+        AI-HRMS - Unique Login Page Style
+    =========================================
+    */
+
+    /* --- Page Wrapper & Layout --- */
+    .login-page-wrapper {
+        display: flex;
+        /* Fill the screen between header and footer */
+        min-height: calc(100vh - 74px - 50px); /* Adjust footer height if different */
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        background-color: var(--light-gray); /* Light background for the form side */
+        overflow: hidden; /* Important for the skewed element */
+    }
+    
+    /* Remove default container padding/margin for this page */
+    main {
+        padding: 0 !important;
+        max-width: 100% !important;
+    }
+
+    /* --- Left Branding Section (with Angled Design) --- */
+    .login-branding-section {
+        flex: 1.2; /* Give it slightly more space on desktop */
+        background: var(--secondary-color);
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        text-align: center;
+        z-index: 2;
+    }
+
+    /* ✨ NEW: The angled divider element */
+    .login-branding-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: -100px; /* Push it out to avoid edge gaps */
+        bottom: 0;
+        width: 200px;
+        background: var(--secondary-color);
+        transform: skewX(-12deg); /* The angle magic! */
+        z-index: 3;
+    }
+
+    #login-canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+    }
+
+    .branding-content {
+        position: relative;
+        z-index: 2;
+        padding: 2rem;
+        animation: fadeIn 1s ease-in-out;
+    }
+    
+    .branding-content .logo-text {
+        font-size: 3.5rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        text-shadow: 0 2px 15px rgba(0, 82, 204, 0.3);
+    }
+    
+    .branding-content .logo-text .ai-text {
+        color: var(--white);
+    }
+
+    .branding-content p {
+        font-size: 1.25rem;
+        font-weight: 300;
+        color: rgba(255, 255, 255, 0.85);
+        margin-top: 15px;
+        max-width: 350px;
+    }
+
+    /* --- Right Form Section --- */
+    .login-form-section {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 4rem; /* More horizontal padding */
+        position: relative;
+        z-index: 1;
+    }
+
+    .form-wrapper {
+        width: 100%;
+        max-width: 420px;
+        background: var(--white);
+        padding: 45px;
+        border-radius: 16px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        animation: fadeInUp 0.8s ease-out forwards;
+    }
+
+    .form-wrapper h2 {
+        font-size: 2.2rem;
+        font-weight: 600;
+        color: var(--secondary-color);
+        margin-bottom: 10px;
+        text-align: center;
+    }
+
+    .form-wrapper .subtitle {
+        color: #555;
+        margin-bottom: 35px;
+        text-align: center;
+    }
+
+    .form-group {
+        margin-bottom: 22px;
+        position: relative;
+    }
+    
+    /* ✨ NEW: Icon styling inside input fields */
+    .form-group .input-icon {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+        font-size: 1.2rem;
+    }
+
+    .form-group input {
+        width: 100%;
+        padding: 14px 15px 14px 50px; /* Add left padding for the icon */
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        font-size: 1rem;
+        transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .form-group input:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 4px rgba(0, 82, 204, 0.15);
+    }
+    
+    /* Move icon color on focus */
+    .form-group input:focus + .input-icon {
+        color: var(--primary-color);
+    }
+    
+    .form-options {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        font-size: 0.9rem;
+    }
+    .form-options a { color: var(--primary-color); text-decoration: none; font-weight: 500; }
+    .form-options a:hover { text-decoration: underline; }
+    
+    .btn-login {
+        width: 100%;
+        padding: 15px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-radius: 10px;
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    .btn-login:hover {
+        background: var(--secondary-color);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0, 82, 204, 0.25);
+    }
+
+    /* ✨ NEW: Social Login Divider */
+    .social-divider {
+        display: flex;
+        align-items: center;
+        text-align: center;
+        color: #aaa;
+        margin: 30px 0;
+    }
+    .social-divider::before,
+    .social-divider::after {
+        content: '';
+        flex: 1;
+        border-bottom: 1px solid var(--border-color);
+    }
+    .social-divider:not(:empty)::before { margin-right: .5em; }
+    .social-divider:not(:empty)::after { margin-left: .5em; }
+
+    /* ✨ NEW: Social Login Buttons */
+    .social-login-buttons {
+        display: flex;
+        gap: 1rem;
+    }
+    .social-btn {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        text-decoration: none;
+        color: var(--secondary-color);
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    .social-btn:hover {
+        border-color: var(--primary-color);
+        background-color: #f9faff;
+    }
+    .social-btn img {
+        width: 20px;
+        height: 20px;
+        margin-right: 10px;
+    }
+
+    /* --- Error Message & Animations --- */
+    .error-message { /* Same as before, looks good */ }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* --- Responsive Design --- */
+    @media (max-width: 992px) {
+        .login-page-wrapper { flex-direction: column; }
+        .login-branding-section {
+            flex: none;
+            min-height: 250px;
+            padding: 2rem;
+        }
+        /* Hide the angled divider on mobile */
+        .login-branding-section::before { display: none; }
+        .login-form-section {
+            padding: 2rem 1.5rem; /* Adjust padding for mobile */
+        }
+    }
+</style>
+
+<div class="login-page-wrapper">
+    
+    <!-- Left Pane: Animated Branding -->
+    <div class="login-branding-section">
+        <canvas id="login-canvas"></canvas>
+        <div class="branding-content">
+            <h1 class="logo-text"><span class="ai-text">NEXT</span>-AI</h1>
+            <p>The Intelligent Platform for Modern Teams.</p>
+        </div>
+    </div>
+
+    <!-- Right Pane: Login Form -->
+    <div class="login-form-section">
+        <div class="form-wrapper">
+            <h2>Welcome Back!</h2>
+            <p class="subtitle">Log in to access your dashboard.</p>
+
+            {% if error %}
+                <div class="error-message">
+                    <p>{{ error }}</p>
+                </div>
+            {% endif %}
+
+            <form method="post" action="{% url 'login' %}">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <!-- ✨ NEW: Added icon -->
+                    <input type="text" name="username" id="id_username" placeholder="Username" required>
+                    <i class='bx bxs-user input-icon'></i>
+                </div>
+                
+                <div class="form-group">
+                    <!-- ✨ NEW: Added icon -->
+                    <input type="password" name="password" id="id_password" placeholder="Password" required>
+                    <i class='bx bxs-lock-alt input-icon'></i>
+                </div>
+
+                <div class="form-options">
+                    <div>
+                        <input type="checkbox" id="remember" name="remember" style="vertical-align: middle;">
+                        <label for="remember" style="display: inline; font-weight: 400; color: #555; vertical-align: middle;">Remember Me</label>
+                    </div>
+                    <a href="#">Forgot Password?</a>
+                </div>
+                
+                <button type="submit" class="btn-login">Login Securely</button>
+
+                <!-- ✨ NEW: Social Login Section -->
+                <div class="social-divider">or</div>
+
+                <div class="social-login-buttons">
+                    <a href="#" class="social-btn">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google logo">
+                        Google
+                    </a>
+                    <a href="#" class="social-btn">
+                         <img src="https://upload.wikimedia.org/wikipedia/commons/b/b3/Font_Awesome_5_brands_github.svg" alt="GitHub logo">
+                        GitHub
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Re-using the animation script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const canvas = document.getElementById('login-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    // Adjusted particle settings for a subtler effect
+    const numParticles = window.innerWidth > 992 ? 70 : 25;
+    const connectDistance = window.innerWidth > 992 ? 140 : 90;
+
+    // Use the RGB values of your brand's primary color
+    // Assuming var(--primary-color) is a blue like #0052CC -> rgb(0, 82, 204)
+    const particleColor = "rgba(0, 82, 204, 0.6)"; 
+    const lineColor = "rgba(0, 82, 204, 0.2)";
+
+    function resizeCanvas() {
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    class Particle {
+        constructor() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height;
+            this.vx = (Math.random() - 0.5) * 0.4;
+            this.vy = (Math.random() - 0.5) * 0.4;
+            this.radius = 2;
+        }
+        update() {
+            this.x += this.vx; this.y += this.vy;
+            if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+            if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+        }
+        draw() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+            ctx.fillStyle = particleColor;
+            ctx.fill();
+        }
+    }
+
+    function init() {
+        particles = [];
+        for (let i = 0; i < numParticles; i++) {
+            particles.push(new Particle());
+        }
+    }
+
+    function connect() {
+        for (let i = 0; i < particles.length; i++) {
+            for (let j = i; j < particles.length; j++) {
+                const distance = Math.hypot(particles[i].x - particles[j].x, particles[i].y - particles[j].y);
+                if (distance < connectDistance) {
+                    ctx.beginPath();
+                    ctx.moveTo(particles[i].x, particles[i].y);
+                    ctx.lineTo(particles[j].x, particles[j].y);
+                    // Fade lines with distance
+                    ctx.strokeStyle = `rgba(0, 82, 204, ${0.4 - distance / connectDistance})`;
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                }
+            }
+        }
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => { p.update(); p.draw(); });
+        connect();
+        requestAnimationFrame(animate);
+    }
+
+    init();
+    animate();
+});
+</script>
+
+{% endblock %}

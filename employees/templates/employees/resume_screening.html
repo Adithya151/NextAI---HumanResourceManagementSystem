@@ -1,0 +1,461 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Advanced AI Resume Screener{% endblock %}
+
+{% block content %}
+<style>
+    /* --- Main Container & Header --- */
+    .screener-container {
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 40px;
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+        border: 1px solid #e5e7eb;
+        animation: fadeIn 0.6s ease-out;
+    }
+
+    .screener-header {
+        text-align: center;
+        margin-bottom: 35px;
+    }
+
+    .screener-header h1 {
+        font-size: 2.8em;
+        font-weight: 700;
+        margin-bottom: 10px;
+        color: #1a202c;
+    }
+
+    .gradient-text {
+        background: linear-gradient(90deg, #4A90E2, #004085);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-fill-color: transparent;
+    }
+
+    .screener-header p {
+        font-size: 1.1em;
+        color: #6b7280;
+        max-width: 650px;
+        margin: 0 auto;
+    }
+
+    /* --- Form Elements --- */
+    .form-section {
+        margin-bottom: 25px;
+    }
+
+    .form-section label {
+        display: block;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 10px;
+        font-size: 1.1rem;
+    }
+
+    textarea#job-description {
+        width: 100%;
+        min-height: 150px;
+        padding: 12px 15px;
+        border-radius: 8px;
+        border: 1px solid #d1d5db;
+        font-family: inherit;
+        font-size: 1rem;
+        transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    textarea#job-description:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+    }
+
+    /* --- Drag-and-Drop Uploader --- */
+    .upload-box {
+        background: #f9fafb;
+        border: 2px dashed #d1d5db;
+        border-radius: 12px;
+        padding: 40px;
+        text-align: center;
+        cursor: pointer;
+        transition: background-color 0.3s, border-color 0.3s;
+        position: relative;
+    }
+
+    .upload-box:hover, .upload-box.is-dragover {
+        border-color: var(--primary-color);
+        background-color: #f0f4ff;
+    }
+
+    .upload-box input[type="file"] {
+        position: absolute; top: 0; left: 0;
+        width: 100%; height: 100%; opacity: 0; cursor: pointer;
+    }
+
+    .upload-icon {
+        font-size: 3.5em; color: var(--primary-color); margin-bottom: 15px;
+    }
+
+    .upload-box p { margin: 0; color: #4b5563; font-weight: 500; }
+    .upload-box .upload-hint { font-size: 0.9em; color: #9ca3af; }
+    
+    /* --- Selected File Display --- */
+    #file-info {
+        margin-top: 15px;
+        font-weight: 500;
+        color: #374151;
+        background: #eef2ff;
+        padding: 10px 15px;
+        border-radius: 8px;
+        display: none; /* Hidden by default */
+        align-items: center;
+        justify-content: space-between;
+    }
+    #file-info i { font-size: 1.5rem; color: var(--primary-color); margin-right: 10px; }
+    #remove-file-btn {
+        background: none; border: none; font-size: 1.5rem; cursor: pointer;
+        color: #9ca3af; transition: color 0.2s;
+    }
+    #remove-file-btn:hover { color: #ef4444; }
+
+    /* --- Submit Button --- */
+    .btn-analyze {
+        width: 100%;
+        padding: 15px;
+        font-size: 1.2em;
+        font-weight: 600;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        background: var(--primary-gradient);
+        color: white; border: none;
+        box-shadow: 0 5px 15px rgba(74, 144, 226, 0.3);
+    }
+    .btn-analyze:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(74, 144, 226, 0.4);
+    }
+    .btn-analyze:disabled {
+        background: #9ca3af; cursor: not-allowed;
+        box-shadow: none; transform: none;
+    }
+
+    /* --- Analysis Report Card (New Output) --- */
+    .result-container { margin-top: 40px; }
+    .analysis-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        animation: popIn 0.5s ease-out;
+    }
+    .analysis-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 25px;
+        border-bottom: 1px solid #e5e7eb;
+        background: #f9fafb;
+        border-radius: 12px 12px 0 0;
+    }
+    .analysis-header h4 { margin: 0; font-size: 1.6rem; color: #1a202c; }
+    .match-score {
+        font-size: 1.8rem;
+        font-weight: 700;
+        padding: 10px 20px;
+        border-radius: 30px;
+        background-color: #dcfce7;
+        color: #166534;
+        border: 1px solid #bbf7d0;
+    }
+    .analysis-body { padding: 25px; }
+    .analysis-section { margin-bottom: 25px; }
+    .analysis-section:last-child { margin-bottom: 0; }
+    .analysis-section h5 {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+    }
+    .analysis-section h5 i {
+        margin-right: 10px;
+        font-size: 1.4rem;
+        color: var(--secondary-color);
+    }
+    .analysis-section ul {
+        list-style-type: none;
+        padding-left: 5px;
+    }
+    .analysis-section li {
+        padding: 8px 0 8px 10px;
+        border-left: 3px solid transparent;
+        transition: background-color 0.2s;
+    }
+    .analysis-section li::before {
+        font-family: 'Boxicons';
+        margin-right: 10px;
+        font-size: 1.2rem;
+    }
+    .strengths li { border-left-color: #22c55e; }
+    .strengths li::before { content: '\ea5c'; color: #22c55e; } /* Check icon */
+    .weaknesses li { border-left-color: #ef4444; }
+    .weaknesses li::before { content: '\ea5b'; color: #ef4444; } /* X icon */
+    .questions li { border-left-color: #6366f1; }
+    .questions li::before { content: '\ed51'; color: #6366f1; } /* Help icon */
+
+    .summary-text { white-space: pre-wrap; line-height: 1.7; color: #4b5563; }
+    .error-message {
+        background: #fee2e2; color: #991b1b; font-weight: 500;
+        border: 1px solid #fca5a5; padding: 25px; border-radius: 12px;
+    }
+
+    /* --- Skeleton Loader --- */
+    .skeleton-loader { display: none; }
+    .skeleton-header { display: flex; justify-content: space-between; align-items: center; padding: 20px 25px; border-bottom: 1px solid #e5e7eb; }
+    .skeleton-h4 { height: 30px; width: 40%; background: #e5e7eb; border-radius: 6px; }
+    .skeleton-score { height: 50px; width: 120px; background: #e5e7eb; border-radius: 30px; }
+    .skeleton-body { padding: 25px; }
+    .skeleton-h5 { height: 24px; width: 30%; background: #e5e7eb; border-radius: 6px; margin-bottom: 15px; }
+    .skeleton-line { height: 20px; background: #e5e7eb; border-radius: 6px; margin-bottom: 10px; }
+    .skeleton-line.w-80 { width: 80%; }
+    .skeleton-line.w-60 { width: 60%; }
+    @keyframes shimmer { 0% { background-position: -1000px 0; } 100% { background-position: 1000px 0; } }
+    .skeleton-loader [class^="skeleton-"] {
+        animation: shimmer 2s infinite;
+        background: linear-gradient(to right, #e5e7eb 8%, #f3f4f6 18%, #e5e7eb 33%);
+        background-size: 1000px 100%;
+    }
+    
+    /* Animations */
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes popIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+</style>
+
+<div class="screener-container">
+    <div class="screener-header">
+        <h1>Advanced AI <span class="gradient-text">Resume Screener</span></h1>
+        <p>Paste the job description and upload a resume to get an instant, in-depth analysis of the candidate's suitability.</p>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" id="resume-form">
+        {% csrf_token %}
+        
+        <div class="form-section">
+            <label for="job-description">1. Paste the Job Description</label>
+            <textarea id="job-description" name="job_description" placeholder="e.g., Senior Python Developer with experience in Django, REST APIs, and AWS..." required></textarea>
+        </div>
+
+        <div class="form-section">
+            <label>2. Upload Resume</label>
+            <div class="upload-box" id="upload-box">
+                <input type="file" name="resume" id="resume-input" accept=".pdf" required>
+                <div class="upload-prompt">
+                    <div class="upload-icon"><i class='bx bx-cloud-upload'></i></div>
+                    <p><strong>Drag & drop resume here</strong></p>
+                    <p class="upload-hint">or click to browse (PDF only)</p>
+                </div>
+            </div>
+            <div id="file-info">
+                <div style="display: flex; align-items: center;">
+                    <i class='bx bxs-file-pdf'></i>
+                    <span id="file-name"></span>
+                </div>
+                <button type="button" id="remove-file-btn" aria-label="Remove file">&times;</button>
+            </div>
+        </div>
+
+        <div class="submit-button-container">
+            <button type="submit" class="btn-analyze" id="analyze-btn" disabled>Analyze Resume</button>
+        </div>
+    </form>
+
+    <!-- This container will hold the result OR the skeleton loader -->
+    <div class="result-container" id="result-container">
+        {% if error %}
+            <div class="error-message"><strong>Error:</strong> {{ error }}</div>
+        {% endif %}
+
+        {% comment %} 
+            NOTE for BACKEND: The 'result' context variable should now be a dictionary, not a string.
+            Example: 
+            result = {
+                'score': 88,
+                'summary': "The candidate is a strong fit...",
+                'strengths': ["Expert in Python/Django", "Extensive AWS experience"],
+                'weaknesses': ["Limited frontend skills", "No mention of CI/CD pipelines"],
+                'interview_questions': ["Ask about their largest Django project.", "Inquire about their experience with AWS Lambda."]
+            }
+        {% endcomment %}
+
+        {% if result %}
+<div class="analysis-card">
+    <div class="analysis-header">
+        <h4>Analysis Report</h4>
+        
+        {% comment %} CHANGED: from result.score to result.match_score {% endcomment %}
+        {% if result.match_score is not None %}
+        <div class="match-score">{{ result.match_score }}% Match</div>
+        {% endif %}
+    </div>
+    <div class="analysis-body">
+        
+        {% comment %} CHANGED: Use result.message as the summary {% endcomment %}
+        {% if result.message %}
+        <div class="analysis-section">
+            <h5><i class='bx bxs-bar-chart-alt-2'></i> Similarity Analysis</h5>
+            <p class="summary-text">{{ result.message }}</p>
+        </div>
+        {% endif %}
+        
+        {% comment %} 
+            NOTE: The sections below (strengths, weaknesses, etc.) will NOT appear 
+            because your current Ai.py does not provide this data. This is expected.
+            To get these sections, you must upgrade to a generative AI model.
+        {% endcomment %}
+        
+        {% if result.strengths %}
+        <div class="analysis-section strengths">
+            <h5><i class='bx bx-check-shield'></i>Strengths & Alignment</h5>
+            <ul>
+                {% for item in result.strengths %}
+                    <li>{{ item }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        {% if result.weaknesses %}
+        <div class="analysis-section weaknesses">
+            <h5><i class='bx bx-error-alt' ></i>Potential Gaps & Risks</h5>
+            <ul>
+                {% for item in result.weaknesses %}
+                    <li>{{ item }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        {% if result.interview_questions %}
+        <div class="analysis-section questions">
+            <h5><i class='bx bx-conversation'></i>Suggested Interview Questions</h5>
+            <ul>
+                {% for item in result.interview_questions %}
+                    <li>{{ item }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+        <!-- Skeleton Loader (hidden by default) -->
+        <div class="skeleton-loader" id="skeleton-loader">
+            <div class="analysis-card">
+                <div class="skeleton-header">
+                    <div class="skeleton-h4"></div>
+                    <div class="skeleton-score"></div>
+                </div>
+                <div class="skeleton-body">
+                    <div class="skeleton-h5"></div>
+                    <div class="skeleton-line"></div>
+                    <div class="skeleton-line w-80"></div>
+                    <br>
+                    <div class="skeleton-h5 w-60"></div>
+                    <div class="skeleton-line"></div>
+                    <div class="skeleton-line w-80"></div>
+                    <div class="skeleton-line w-60"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('resume-form');
+    const uploadBox = document.getElementById('upload-box');
+    const resumeInput = document.getElementById('resume-input');
+    const jobDescriptionInput = document.getElementById('job-description');
+    
+    const fileInfo = document.getElementById('file-info');
+    const fileNameDisplay = document.getElementById('file-name');
+    const removeFileBtn = document.getElementById('remove-file-btn');
+    const uploadPrompt = document.querySelector('.upload-prompt');
+    
+    const analyzeBtn = document.getElementById('analyze-btn');
+    const resultContainer = document.getElementById('result-container');
+    const skeletonLoader = document.getElementById('skeleton-loader');
+
+    // --- Validation to enable/disable button ---
+    function validateForm() {
+        const hasFile = resumeInput.files.length > 0;
+        const hasDescription = jobDescriptionInput.value.trim() !== '';
+        analyzeBtn.disabled = !(hasFile && hasDescription);
+    }
+
+    jobDescriptionInput.addEventListener('input', validateForm);
+    resumeInput.addEventListener('change', validateForm);
+    
+    // --- Drag and Drop Logic ---
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        uploadBox.addEventListener(eventName, e => {
+            e.preventDefault();
+            e.stopPropagation();
+        });
+    });
+    ['dragenter', 'dragover'].forEach(eventName => {
+        uploadBox.addEventListener(eventName, () => uploadBox.classList.add('is-dragover'));
+    });
+    ['dragleave', 'drop'].forEach(eventName => {
+        uploadBox.addEventListener(eventName, () => uploadBox.classList.remove('is-dragover'));
+    });
+
+    uploadBox.addEventListener('drop', (e) => {
+        if (e.dataTransfer.files.length) {
+            resumeInput.files = e.dataTransfer.files;
+            handleFileSelection();
+        }
+    });
+
+    resumeInput.addEventListener('change', handleFileSelection);
+
+    function handleFileSelection() {
+        if (resumeInput.files.length > 0) {
+            const file = resumeInput.files[0];
+            fileNameDisplay.textContent = file.name;
+            uploadPrompt.style.display = 'none';
+            fileInfo.style.display = 'flex';
+            validateForm(); // Re-validate form
+        }
+    }
+
+    // --- Remove File Logic ---
+    removeFileBtn.addEventListener('click', () => {
+        resumeInput.value = ''; // Clear the file input
+        fileInfo.style.display = 'none';
+        uploadPrompt.style.display = 'block';
+        validateForm(); // Re-validate form
+    });
+    
+    // --- Form Submission Logic ---
+    form.addEventListener('submit', function(e) {
+        if (analyzeBtn.disabled) {
+            e.preventDefault();
+            return;
+        }
+        // Hide form, show loader
+        form.style.display = 'none';
+        resultContainer.innerHTML = ''; // Clear previous results
+        skeletonLoader.style.display = 'block';
+        resultContainer.appendChild(skeletonLoader);
+    });
+});
+</script>
+
+{% endblock %}

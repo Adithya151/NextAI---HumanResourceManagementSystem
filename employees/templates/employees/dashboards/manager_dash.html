@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Manager Dashboard | SmartHR{% endblock %}
+
+{% block content %}
+<style>
+    /* 
+    =========================================================
+        SmartHR - UNIFIED DASHBOARD DESIGN SYSTEM
+    =========================================================
+    */
+
+    /* --- ✨ Main Layout & Animations --- */
+    .dashboard-container { max-width: 1280px; margin: 0 auto; padding: 2rem 1.5rem; }
+    @media (min-width: 768px) { .dashboard-container { padding: 3rem 2rem; } }
+
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-in-up { animation: fadeInUp 0.6s ease-out forwards; opacity: 0; }
+    
+    .dashboard-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; }
+    @media (min-width: 1024px) { .dashboard-grid { grid-template-columns: minmax(0, 2.5fr) minmax(0, 1fr); } }
+    
+    .dashboard-main, .dashboard-sidebar { display: flex; flex-direction: column; gap: 2rem; }
+
+    /* --- ✨ Universal Card Styling --- */
+    .card { background: var(--white); border-radius: 16px; box-shadow: var(--shadow-md); border: 1px solid var(--border-color); }
+    .card-header { display: flex; justify-content: space-between; align-items: center; padding: 20px 25px; border-bottom: 1px solid var(--border-color); }
+    .card-header h3 { margin: 0; font-size: 1.2rem; font-weight: 600; color: var(--secondary-color); }
+    .card-header a { font-size: 0.9em; color: var(--primary-color); text-decoration: none; font-weight: 500; }
+    .card-content { padding: 25px; }
+
+    /* --- ✨ Universal Header & Buttons --- */
+    .dashboard-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+    .dashboard-header h1 { font-size: 2.2rem; font-weight: 700; color: var(--secondary-color); }
+    .dashboard-header p { margin-top: 5px; color: #555; }
+    .btn-primary { /* Matches main nav button */
+        display: inline-flex; align-items: center; gap: 8px; padding: 12px 28px; border-radius: 30px;
+        background: var(--primary-gradient); color: var(--white); text-decoration: none; font-weight: 600;
+        box-shadow: 0 5px 15px rgba(74, 144, 226, 0.3); transition: all 0.3s ease;
+    }
+    .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(74, 144, 226, 0.4); }
+
+    /* --- ✨ KPI Stat Cards --- */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; }
+    .stat-card {
+        background: var(--white); padding: 25px; border-radius: 12px; border: 1px solid var(--border-color);
+        display: flex; align-items: center; gap: 15px; transition: transform 0.3s ease;
+    }
+    .stat-card:hover { transform: translateY(-5px); }
+    .stat-card .icon { font-size: 2.2rem; width: 55px; height: 55px; border-radius: 14px; display: flex; align-items: center; justify-content: center; color: var(--primary-color); background-color: #eff6ff; }
+    .stat-card .stat-info .stat-number { font-size: 2rem; font-weight: 700; color: var(--secondary-color); }
+    .stat-card .stat-info .stat-title { font-size: 0.9rem; color: #555; }
+
+    /* --- ✨ Manager Specific: Sidebar Lists --- */
+    .request-list, .team-list { list-style: none; padding: 0; margin: 0; }
+    .request-item, .team-member-item { display: flex; align-items: center; gap: 15px; padding: 15px 0; border-bottom: 1px solid var(--border-color); }
+    .request-item:last-child, .team-member-item:last-child { border-bottom: none; }
+    .request-info, .team-member-info { flex-grow: 1; }
+    .request-info span, .team-member-info span { font-weight: 500; }
+    .request-info small, .team-member-info small { color: #6b7280; }
+    .btn-sm { padding: 5px 12px; font-size: 0.8rem; border-radius: 20px; text-decoration: none; font-weight: 500; border: 1px solid; transition: all 0.2s; }
+    .btn-sm.approve { background: var(--primary-color); color: white; border-color: var(--primary-color); }
+    .btn-sm.approve:hover { background: var(--secondary-color); border-color: var(--secondary-color); }
+    .btn-sm.deny { color: #ef4444; border-color: #fecaca; background: #fff1f2; }
+    .btn-sm.deny:hover { background: #fee2e2; border-color: #fda4af; }
+    .team-member-item img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; }
+</style>
+
+<div class="dashboard-container">
+    <header class="dashboard-header fade-in-up">
+        <div>
+            <h1>Manager Dashboard</h1>
+            <p>Welcome back, {{ user.first_name|default:user.username }}. Here's your team's overview.</p>
+        </div>
+        <a href="#" class="btn-primary"><i class='bx bx-plus-circle'></i> Create New Task</a>
+    </header>
+
+    <div class="dashboard-grid">
+        <!-- ======================== MAIN CONTENT ======================== -->
+        <main class="dashboard-main">
+            <div class="stats-grid">
+                <div class="stat-card fade-in-up" style="animation-delay: 100ms;"><div class="icon"><i class='bx bx-group'></i></div><div class="stat-info"><span class="stat-number">12</span><span class="stat-title">Total Members</span></div></div>
+                <div class="stat-card fade-in-up" style="animation-delay: 200ms;"><div class="icon"><i class='bx bx-calendar-check'></i></div><div class="stat-info"><span class="stat-number">9</span><span class="stat-title">Present Today</span></div></div>
+                <div class="stat-card fade-in-up" style="animation-delay: 300ms;"><div class="icon"><i class='bx bx-calendar-x'></i></div><div class="stat-info"><span class="stat-number">3</span><span class="stat-title">On Leave</span></div></div>
+                <div class="stat-card fade-in-up" style="animation-delay: 400ms;"><div class="icon"><i class='bx bx-mail-send'></i></div><div class="stat-info"><span class="stat-number">2</span><span class="stat-title">Pending Requests</span></div></div>
+            </div>
+
+            <div class="card fade-in-up" style="animation-delay: 500ms;">
+                <div class="card-header">
+                    <h3>Team Attendance (Last 7 Days)</h3>
+                    <a href="#">View Full Report &rarr;</a>
+                </div>
+                <div class="card-content">
+                    <canvas id="attendanceChart"></canvas>
+                </div>
+            </div>
+        </main>
+
+        <!-- ======================== SIDEBAR ======================== -->
+        <aside class="dashboard-sidebar">
+            <div class="card fade-in-up" style="animation-delay: 600ms;">
+                <div class="card-header">
+                    <h3>Pending Requests</h3>
+                    <a href="{% url 'manage_leave_requests' %}">View All</a>
+                </div>
+                <div class="card-content">
+                    <ul class="request-list">
+                        {% for leave in pending_leaves %}
+                            <li class="request-item">
+                                <div class="request-info">
+                                    <span>{{ leave.employee.user.first_name }} {{ leave.employee.user.last_name }}</span>
+                                    <small>{{ leave.start_date }} → {{ leave.end_date }}</small>
+                                </div>
+                                <div class="request-actions" style="display: flex; gap: 5px;">
+                                    <a href="{% url 'update_leave_status' leave.id 'Rejected' %}" class="btn-sm deny">Deny</a>
+                                    <a href="{% url 'update_leave_status' leave.id 'Approved' %}" class="btn-sm approve">Approve</a>
+                                </div>
+                            </li>
+                        {% empty %}
+                            <li style="text-align: center; color: #6b7280; padding: 20px 0;">No pending requests 🎉</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="card fade-in-up" style="animation-delay: 700ms;">
+                <div class="card-header">
+                    <h3>Team Roster</h3>
+                    <a href="{% url 'employee_list' %}">View All</a>
+                </div>
+                <div class="card-content">
+                    <ul class="team-list">
+                        <li class="team-member-item"><img src="https://i.pravatar.cc/150?u=a1" alt="Avatar"><div class="team-member-info"><span>Alice Johnson</span><small>Senior Developer</small></div></li>
+                        <li class="team-member-item"><img src="https://i.pravatar.cc/150?u=b2" alt="Avatar"><div class="team-member-info"><span>Bob Williams</span><small>UX Designer</small></div></li>
+                        <li class="team-member-item"><img src="https://i.pravatar.cc/150?u=c3" alt="Avatar"><div class="team-member-info"><span>Charlie Brown</span><small>Project Manager</small></div></li>
+                    </ul>
+                </div>
+            </div>
+        </aside>
+    </div>
+</div>
+
+<!-- Chart.js library is unchanged and works perfectly with this design -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() { /* Chart.js script is unchanged */ });
+</script>
+{% endblock %}

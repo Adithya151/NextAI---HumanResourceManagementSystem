@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Attendance Report{% endblock %}
+
+{% block content %}
+<style>
+/* General container to center the content and provide padding */
+.report-container {
+    padding: 40px 20px;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+/* The main card holding the report */
+.report-card {
+    max-width: 1000px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.07);
+    overflow: hidden; /* Important for keeping border-radius on the table */
+    border: 1px solid #e5e7eb;
+}
+
+/* Header section for title and actions */
+.report-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 25px;
+    border-bottom: 1px solid #e5e7eb;
+    background: #f9fafb;
+}
+
+.report-header h1 {
+    margin: 0;
+    font-size: 1.5em;
+    color: #1a202c;
+}
+
+/* Placeholder for future action buttons like 'Export' */
+.report-actions .btn {
+    padding: 8px 16px;
+    background: var(--primary-color, #3B82F6);
+    color: white;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 0.9em;
+    font-weight: 500;
+    transition: background-color 0.3s;
+}
+.report-actions .btn:hover {
+    background: var(--secondary-color, #2563EB);
+}
+
+/* Wrapper to make the table scroll horizontally on small screens */
+.table-wrapper {
+    overflow-x: auto;
+    padding: 0;
+}
+
+/* The main table styling */
+.styled-table {
+    width: 100%;
+    border-collapse: collapse; /* Removes space between cells */
+    font-size: 1em;
+}
+
+.styled-table thead tr {
+    background-color: #f9fafb; /* Lighter than header for subtle distinction */
+    color: #4b5563;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.85em;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.styled-table th,
+.styled-table td {
+    padding: 15px 25px;
+}
+
+.styled-table tbody tr {
+    border-bottom: 1px solid #e5e7eb;
+    transition: background-color 0.2s ease;
+}
+
+/* Zebra-striping for better readability */
+.styled-table tbody tr:nth-of-type(even) {
+    background-color: #fdfdfd;
+}
+
+/* Hover effect to highlight rows */
+.styled-table tbody tr:hover {
+    background-color: #f0f4ff;
+}
+
+.styled-table tbody tr:last-of-type {
+    border-bottom: none;
+}
+
+/* Status Badges */
+.status-badge {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.8em;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.status-present {
+    color: #065f46;
+    background-color: #d1fae5;
+}
+
+.status-absent,
+.status-leave { /* You can add more statuses easily */
+    color: #991b1b;
+    background-color: #fee2e2;
+}
+
+/* Style for the 'no records' message */
+.empty-state {
+    text-align: center;
+    padding: 50px;
+    color: #6b7280;
+}
+.empty-state p {
+    font-size: 1.1em;
+}
+
+/* Simple fade-in animation */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
+
+<div class="report-container">
+    <div class="report-card">
+        <div class="report-header">
+            <h1>Attendance Report</h1>
+            <div class="report-actions">
+                <!-- You can add buttons here later, e.g., for exporting data -->
+                <!-- <a href="#" class="btn">Export as CSV</a> -->
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+            <table class="styled-table">
+                <thead>
+                    <tr>
+                        {% if user.role == 'Admin' or user.role == 'Manager' %}
+                            <th>Employee</th>
+                        {% endif %}
+                        <th>Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in records %}
+                    <tr>
+                        {% if user.role == 'Admin' or user.role == 'Manager' %}
+                            <td>{{ record.employee.user.get_full_name|default:record.employee.user.username }}</td>
+                        {% endif %}
+                        <td>{{ record.date }}</td>
+                        <td>
+                            {% if record.status == 'Present' %}
+                                <span class="status-badge status-present">{{ record.status }}</span>
+                            {% else %}
+                                <span class="status-badge status-absent">{{ record.status }}</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <!-- This part is now outside the table for better styling control -->
+                    {% endfor %}
+                </tbody>
+            </table>
+            
+            {% if not records %}
+                <div class="empty-state">
+                    <p>No attendance records found.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

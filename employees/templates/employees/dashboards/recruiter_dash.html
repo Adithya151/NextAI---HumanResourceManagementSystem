@@ -1,0 +1,261 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Recruiter Dashboard | SmartHR{% endblock %}
+
+{% block content %}
+<style>
+    /* 
+    ================================================
+        SmartHR - Professional Recruiter Dashboard
+        - Fully integrated with base.html styles
+    ================================================
+    */
+
+    /* --- ✨ NEW: Shared Design System Variables --- */
+    :root {
+        /* These are inherited but defined here for clarity if this were a separate file */
+        --shadow-sm: 0 2px 4px rgba(0,0,0,0.04);
+        --shadow-md: 0 5px 15px rgba(0,0,0,0.06);
+        --shadow-lg: 0 15px 35px rgba(0,0,0,0.1);
+    }
+
+    /* --- ✨ NEW: Main Dashboard Container --- */
+    .dashboard-container {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 2rem 1.5rem; /* Padding for mobile */
+    }
+    @media (min-width: 768px) {
+        .dashboard-container {
+            padding: 3rem 2rem; /* More space on larger screens */
+        }
+    }
+
+    /* --- ✨ NEW: Upgraded Animations --- */
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in-up {
+        animation: fadeInUp 0.6s ease-out forwards;
+        opacity: 0; /* Start hidden */
+    }
+
+    /* --- Header & Main Button --- */
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2.5rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    .dashboard-header h1 {
+        font-size: 2.2rem;
+        color: var(--secondary-color);
+        font-weight: 700;
+    }
+    .dashboard-header p {
+        margin-top: 5px;
+        color: #555;
+    }
+    .btn-primary { /* Style to match nav button */
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 28px;
+        border-radius: 30px;
+        background: var(--primary-gradient);
+        color: var(--white);
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(74, 144, 226, 0.3);
+    }
+    .btn-primary:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(74, 144, 226, 0.4);
+    }
+    
+    /* --- Redesigned KPI Cards --- */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2.5rem;
+    }
+    .stat-card {
+        background: var(--white);
+        padding: 25px;
+        border-radius: 16px;
+        border: 1px solid var(--border-color);
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .stat-card:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--shadow-lg);
+    }
+    .stat-card .stat-icon {
+        font-size: 2rem;
+        flex-shrink: 0;
+        width: 55px;
+        height: 55px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .stat-card .stat-number { font-size: 2.2rem; font-weight: 700; color: var(--secondary-color); line-height: 1; }
+    .stat-card .stat-title { font-size: 0.95rem; color: #555; margin-top: 5px; }
+
+    /* Color theming for cards */
+    .stat-card.positions .stat-icon { color: #3b82f6; background: #eff6ff; }
+    .stat-card.candidates .stat-icon { color: #22c55e; background: #f0fdf4; }
+    .stat-card.time-hire .stat-icon { color: #f59e0b; background: #fffbeb; }
+    .stat-card.cost-hire .stat-icon { color: #9333ea; background: #faf5ff; }
+
+    /* --- Main Content Grid --- */
+    .recruitment-grid {
+        display: grid;
+        grid-template-columns: 1fr; /* Mobile-first: single column */
+        gap: 2rem;
+    }
+    @media (min-width: 992px) {
+        .recruitment-grid {
+            grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); /* 2/3 and 1/3 layout on desktop */
+        }
+    }
+    
+    /* --- Universal Card Styling --- */
+    .card {
+        background: var(--white);
+        border-radius: 16px;
+        box-shadow: var(--shadow-md);
+        border: 1px solid var(--border-color);
+        height: 100%; /* Make cards in a row the same height */
+    }
+    .card-header {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 20px 25px; border-bottom: 1px solid var(--border-color);
+    }
+    .card-header h3 { margin: 0; font-size: 1.2rem; font-weight: 600; color: var(--secondary-color); }
+    .card-header a { color: var(--primary-color); text-decoration: none; font-weight: 500; font-size: 0.9rem; }
+    .card-content { padding: 25px; }
+
+    /* --- Enhanced Pipeline Funnel --- */
+    .pipeline-funnel { display: flex; flex-direction: column; gap: 1rem; }
+    .pipeline-stage {
+        position: relative; background: #f9fafb; border-radius: 8px;
+        padding: 1rem; overflow: hidden; transition: background-color 0.2s;
+    }
+    .pipeline-stage:hover { background-color: #f4f6f8; }
+    .pipeline-stage-info { display: flex; align-items: center; gap: 1rem; position: relative; z-index: 2; }
+    .pipeline-stage-info .icon { color: var(--secondary-color); font-size: 1.2rem; }
+    .pipeline-stage-info .label { font-weight: 600; color: var(--secondary-color); flex-grow: 1; }
+    .pipeline-stage-info .count { font-weight: 700; font-size: 1.1rem; color: var(--primary-color); }
+    .pipeline-stage-bar {
+        position: absolute; top: 0; left: 0; height: 100%; z-index: 1;
+        background: linear-gradient(90deg, #dbeafe 0%, #eff6ff 100%);
+        border-radius: 8px; transition: width 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+    
+    /* --- Action & Activity Sidebar --- */
+    .action-list, .activity-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+    .action-item {
+        display: flex; align-items: center; gap: 15px; padding: 15px; text-decoration: none;
+        border-radius: 10px; transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+    .action-item:hover { background-color: #f9faff; transform: translateX(5px); }
+    .action-item .icon { font-size: 1.8rem; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--primary-color); background-color: #eff6ff; }
+    .action-item h4 { margin: 0; font-size: 1rem; color: var(--secondary-color); }
+    .action-item p { margin: 2px 0 0 0; font-size: 0.85rem; color: #555; }
+
+    .activity-list { gap: 20px; }
+    .activity-item { display: flex; align-items: center; gap: 15px; }
+    .activity-item .icon { font-size: 1.5rem; width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .activity-item.application .icon { color: #10b981; background: #ecfdf5; }
+    .activity-item.interview .icon { color: #8b5cf6; background: #f5f3ff; }
+    .activity-item.posted .icon { color: #f97316; background: #fff7ed; }
+    .activity-info p { margin: 0; font-weight: 500; color: #333; }
+    .activity-info small { color: #6b7280; }
+</style>
+
+<div class="dashboard-container">
+    <div class="dashboard-header fade-in-up">
+        <div>
+            <h1>Recruitment Dashboard</h1>
+            <p>Welcome, {{ user.first_name|default:user.username }}. Here's your hiring overview.</p>
+        </div>
+        <a href="#" class="btn-primary"><i class='bx bx-briefcase-alt-2'></i> Post New Job</a>
+    </div>
+
+    <div class="stats-grid">
+        <!-- These values can be passed from your Django view context -->
+        <div class="stat-card positions fade-in-up" style="animation-delay: 100ms;">
+            <div class="stat-icon"><i class='bx bx-target-lock'></i></div>
+            <div><div class="stat-number">6</div><div class="stat-title">Open Positions</div></div>
+        </div>
+        <div class="stat-card candidates fade-in-up" style="animation-delay: 200ms;">
+            <div class="stat-icon"><i class='bx bxs-user-detail'></i></div>
+            <div><div class="stat-number">85</div><div class="stat-title">Active Candidates</div></div>
+        </div>
+        <div class="stat-card time-hire fade-in-up" style="animation-delay: 300ms;">
+            <div class="stat-icon"><i class='bx bx-time'></i></div>
+            <div><div class="stat-number">28d</div><div class="stat-title">Avg. Time to Hire</div></div>
+        </div>
+        <div class="stat-card cost-hire fade-in-up" style="animation-delay: 400ms;">
+            <div class="stat-icon"><i class='bx bx-dollar-circle'></i></div>
+            <div><div class="stat-number">$2.1k</div><div class="stat-title">Avg. Cost per Hire</div></div>
+        </div>
+    </div>
+
+    <div class="recruitment-grid">
+        <!-- Left Column: Pipeline Funnel -->
+        <div class="card fade-in-up" style="animation-delay: 500ms;">
+            <div class="card-header">
+                <h3>Hiring Pipeline Funnel</h3>
+                <a href="#">Manage Pipeline</a>
+            </div>
+            <div class="card-content">
+                <div class="pipeline-funnel">
+                    <!-- Example Data: In a real app, calculate percentages and pass counts from your Django view -->
+                    <div class="pipeline-stage"><div class="pipeline-stage-bar" style="width: 100%;"></div><div class="pipeline-stage-info"><i class='bx bx-file-find icon'></i><span class="label">Application Review</span> <span class="count">45</span></div></div>
+                    <div class="pipeline-stage"><div class="pipeline-stage-bar" style="width: 66%;"></div><div class="pipeline-stage-info"><i class='bx bx-bot icon'></i><span class="label">AI Screening</span> <span class="count">30</span></div></div>
+                    <div class="pipeline-stage"><div class="pipeline-stage-bar" style="width: 22%;"></div><div class="pipeline-stage-info"><i class='bx bx-calendar-check icon'></i><span class="label">Interview Scheduled</span> <span class="count">10</span></div></div>
+                    <div class="pipeline-stage"><div class="pipeline-stage-bar" style="width: 11%;"></div><div class="pipeline-stage-info"><i class='bx bx-paper-plane icon'></i><span class="label">Offer Extended</span> <span class="count">5</span></div></div>
+                    <div class="pipeline-stage"><div class="pipeline-stage-bar" style="width: 6%;"></div><div class="pipeline-stage-info"><i class='bx bx-user-check icon'></i><span class="label">Hired / Onboarding</span> <span class="count">3</span></div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Actions & Activity -->
+        <div style="display: flex; flex-direction: column; gap: 2rem;">
+            <div class="card fade-in-up" style="animation-delay: 600ms;">
+                <div class="card-header"><h3>Quick Actions</h3></div>
+                <div class="card-content">
+                    <div class="action-list">
+                        <a href="{% url 'add_employee' %}" class="action-item"><div class="icon"><i class='bx bxs-user-plus'></i></div><div><h4>Onboard New Hire</h4><p>Create profile and finalize documentation.</p></div></a>
+                        <a href="{% url 'resume_screening' %}" class="action-item"><div class="icon"><i class='bx bxs-brain'></i></div><div><h4>AI Resume Screening</h4><p>Upload applications for automated ranking.</p></div></a>
+                        <a href="#" class="action-item"><div class="icon"><i class='bx bxs-calendar-plus'></i></div><div><h4>Schedule Interviews</h4><p>Manage calendars and coordinate sessions.</p></div></a>
+                    </div>
+                </div>
+            </div>
+            <div class="card fade-in-up" style="animation-delay: 700ms;">
+                <div class="card-header"><h3>Recent Activity</h3></div>
+                <div class="card-content">
+                    <ul class="activity-list">
+                        <li class="activity-item application"><div class="icon"><i class='bx bx-file-blank'></i></div><div class="activity-info"><p>New Application: S. Engineer</p><small>2 hours ago</small></div></li>
+                        <li class="activity-item interview"><div class="icon"><i class='bx bx-calendar-check'></i></div><div class="activity-info"><p>Interview with Maria Lopez</p><small>Yesterday, 10:00 AM</small></div></li>
+                        <li class="activity-item posted"><div class="icon"><i class='bx bx-briefcase-alt-2'></i></div><div class="activity-info"><p>Posted "Data Analyst" role</p><small>3 days ago</small></div></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

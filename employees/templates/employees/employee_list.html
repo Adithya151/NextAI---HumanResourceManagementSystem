@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}Employee List{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center;">
+    <h1>All Employees</h1>
+    {% if user.role == 'Admin' or user.role == 'Recruiter' %}
+        <a href="{% url 'add_employee' %}" class="btn">Add Employee Profile</a>
+    {% endif %}
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>Username</th>
+            <th>Department</th>
+            <th>Salary</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for emp in employees %}
+        <tr>
+            <td>{{ emp.user.username }}</td>
+            <td>{{ emp.department|default:"N/A" }}</td>
+            <td>${{ emp.salary|floatformat:2 }}</td>
+            <td>
+                <a href="#" class="btn">Edit</a>
+                <a href="#" class="btn btn-danger">Delete</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4">No employee profiles found.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

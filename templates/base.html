@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SmartHR — AI-Driven HR Portal{% endblock %}</title>
+
+    {% load static %}
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
+    <style>
+        :root {
+            --primary-color: #4A90E2;
+            --secondary-color: #004085;
+            --accent-color: #50E3C2;
+            --primary-gradient: linear-gradient(90deg, #4A90E2 0%, #0056b3 100%);
+            --text-color: #34495e;
+            --light-gray: #f8f9fa;
+            --border-color: #dee2e6;
+            --white: #fff;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:"Poppins",sans-serif; }
+
+        body {
+            background-color: var(--white);
+            color: var(--text-color);
+            min-height: 100vh;
+            display:flex;
+            flex-direction:column;
+            line-height: 1.6;
+        }
+
+        header {
+            background: rgba(255,255,255,0.85);
+            box-shadow:0 4px 15px rgba(0,0,0,0.05);
+            backdrop-filter:blur(12px);
+            position:sticky;
+            top:0;
+            z-index:100;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        nav {
+            max-width:1280px;
+            margin: auto;
+            padding:1rem 1.5rem;
+            display:flex;
+            align-items:center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .logo img { height: 50px; width: auto; }
+
+        .nav-right {
+            display: flex;
+            align-items:center;
+            gap: 1rem;
+        }
+
+        .nav-links a {
+            margin:0 1rem;
+            text-decoration:none;
+            color: var(--text-color);
+            font-weight:500;
+            transition:color 0.3s;
+            position: relative;
+            padding-bottom: 5px;
+        }
+
+        .nav-links a:hover { color:var(--primary-color); }
+
+        .nav-btn {
+            padding:10px 20px;
+            border-radius:30px;
+            background: var(--primary-gradient);
+            color:#fff;
+            text-decoration:none;
+            font-weight: 600;
+            transition:all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(74, 144, 226, 0.3);
+        }
+        .nav-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(74, 144, 226, 0.4);
+        }
+
+        /* Profile icon & dropdown */
+        .profile-menu {
+            position: relative;
+            display: inline-block;
+        }
+
+        .profile-icon {
+            color: var(--primary-color);
+            font-size: 1.8rem;
+            transition: color 0.3s;
+            cursor: pointer;
+        }
+        .profile-icon:hover { color: var(--secondary-color); }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 120%;
+            background-color: var(--white);
+            min-width: 180px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            z-index: 101;
+            padding: 0.5rem 0;
+            overflow: hidden;
+        }
+        .profile-menu:hover .dropdown-content {
+            display: block;
+        }
+        .dropdown-content a {
+            color: var(--text-color);
+            padding: 12px 16px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .dropdown-content a:hover {
+            background-color: var(--light-gray);
+            color: var(--primary-color);
+        }
+
+        /* Messages */
+        .messages {
+            max-width: 800px;
+            margin: 1rem auto;
+            text-align: center;
+        }
+        .alert {
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+        .alert-success { background-color: #d1fae5; color: #065f46; }
+        .alert-error { background-color: #fee2e2; color: #991b1b; }
+        .alert-info { background-color: #bfdbfe; color: #1e3a8a; }
+
+        main { flex-grow: 1; }
+
+        footer {
+            background: var(--secondary-color);
+            color: rgba(255,255,255,0.8);
+            padding: 3rem 1.5rem;
+            margin-top: auto;
+        }
+        .footer-bottom {
+            text-align: center;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <nav>
+        <div class="logo"><img src="{% static 'images/logo.png' %}" alt="SmartHR Logo"></div>
+
+        <div class="nav-right">
+            <div class="nav-links">
+                <a href="{% url 'home' %}">Home</a>
+                <a href="#features">Features</a>
+                <a href="#">About</a>
+                <a href="#">Contact</a>
+            </div>
+
+            {% if user.is_authenticated %}
+                <!-- Profile dropdown with dashboard and logout -->
+                <div class="profile-menu">
+                    <i class='bx bxs-user-circle profile-icon'></i>
+                    <div class="dropdown-content">
+                        <a href="{% url 'dashboard' %}"><i class='bx bxs-dashboard'></i> Dashboard</a>
+                        <a href="{% url 'logout' %}"><i class='bx bx-log-out'></i> Logout</a>
+                    </div>
+                </div>
+            {% else %}
+                <!-- If user not logged in -->
+                <a href="{% url 'login' %}?next=home" class="nav-btn">Login</a>
+            {% endif %}
+        </div>
+    </nav>
+</header>
+
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<main>
+    {% block content %}
+    {% endblock %}
+</main>
+
+<footer>
+    <div class="footer-bottom">
+        © {% now "Y" %} SmartHR — Built with ❤️ using Django & AI
+    </div>
+</footer>
+
+<!-- Optional: Disable back navigation after logout -->
+<script>
+    if (window.history && window.history.pushState) {
+        window.history.pushState(null, "", window.location.href);
+        window.onpopstate = function () {
+            window.history.pushState(null, "", window.location.href);
+        };
+    }
+</script>
+
+</body>
+</html>

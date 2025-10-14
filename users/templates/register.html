@@ -1,0 +1,43 @@
+<!-- templates/register.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register</title>
+    <style>
+        /* Simple styling to make errors stand out */
+        .errorlist {
+            color: #b94a48; /* Red */
+            background-color: #f2dede; /* Light pink */
+            border: 1px solid #ebccd1;
+            padding: 10px;
+            border-radius: 4px;
+            list-style-type: none; /* Removes bullet points */
+        }
+    </style>
+</head>
+<body>
+    <h2>Create a New Account</h2>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <!-- THIS IS THE MOST IMPORTANT PART FOR DEBUGGING -->
+        {% if form.errors %}
+            <div class="form-errors">
+                <p>Please correct the errors below:</p>
+                {{ form.errors }}
+            </div>
+        {% endif %}
+
+        <!-- Render form fields one by one for better control, or use {{ form.as_p }} for simplicity -->
+        {{ form.as_p }}
+
+        <button type="submit">Register</button>
+    </form>
+
+    <p>Already have an account? <a href="{% url 'login' %}">Login here</a></p>
+
+</body>
+</html>

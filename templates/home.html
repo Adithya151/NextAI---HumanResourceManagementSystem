@@ -1,0 +1,277 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Welcome to SmartHR — AI-Powered HR Management{% endblock %}
+
+{% block content %}
+<style>
+/* === Hero Section (Mobile-First) === */
+.hero-wrapper {
+    position: relative;
+    overflow: hidden;
+}
+.hero {
+    max-width: 1280px;
+    margin: auto;
+    padding: 4rem 1.5rem;
+    display: flex;
+    flex-direction: column; /* Mobile first: stack elements */
+    align-items: center;
+    text-align: center;
+    gap: 3rem;
+}
+.hero-text {
+    z-index: 1;
+}
+.hero-text h1 {
+    font-size: 2.8rem; /* Adjusted for mobile */
+    line-height: 1.2;
+    font-weight: 800;
+    margin-bottom: 1rem;
+}
+.gradient-text {
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-fill-color: transparent;
+}
+.hero-text p {
+    font-size: 1.1rem; /* Adjusted for mobile */
+    color: #555;
+    margin-bottom: 2rem;
+    max-width: 550px;
+}
+.cta-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center; /* Center buttons on mobile */
+    flex-wrap: wrap;
+}
+.cta-buttons a {
+    display: inline-block;
+    padding: 14px 30px;
+    border-radius: 30px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+.cta-primary {
+    color: #fff;
+    background: var(--primary-gradient);
+    box-shadow: 0 8px 25px rgba(74, 144, 226, 0.3);
+}
+.cta-secondary {
+    color: var(--primary-color);
+    background: var(--white);
+    border-color: var(--primary-color);
+}
+
+/* ✨ NEW: Hero Animation Container */
+.hero-animation {
+    width: 300px;
+    height: 300px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.hero-animation::before { /* Central glowing core */
+    content: '';
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    background: radial-gradient(circle, rgba(74, 144, 226, 0.3), transparent 60%);
+    border-radius: 50%;
+    animation: pulse 4s ease-in-out infinite;
+}
+.animated-icon {
+    position: absolute;
+    width: 60px; height: 60px;
+    background: var(--white);
+    border-radius: 50%;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: var(--primary-color);
+    animation: float-orbit 15s linear infinite;
+}
+.icon-1 { top: 0; left: 50%; transform: translateX(-50%); animation-delay: -12s; }
+.icon-2 { top: 50%; right: 0; transform: translateY(-50%); animation-delay: -3s; }
+.icon-3 { bottom: 0; left: 50%; transform: translateX(-50%); animation-delay: -7s; }
+.icon-4 { top: 50%; left: 0; transform: translateY(-50%); animation-delay: 0s; }
+
+@keyframes float-orbit {
+    0% { transform: translate(0, 0) rotate(0deg) translateX(120px) rotate(0deg); }
+    100% { transform: translate(0, 0) rotate(360deg) translateX(120px) rotate(-360deg); }
+}
+@keyframes pulse {
+    0% { transform: scale(0.9); opacity: 0.7; }
+    50% { transform: scale(1.2); opacity: 1; }
+    100% { transform: scale(0.9); opacity: 0.7; }
+}
+
+
+/* === DESKTOP LAYOUT for Hero === */
+@media (min-width: 992px) {
+    .hero {
+        flex-direction: row; /* Side-by-side on desktop */
+        justify-content: space-between;
+        text-align: left;
+        padding: 6rem 2rem;
+        gap: 4rem;
+    }
+    .hero-text { flex: 1.2; }
+    .hero-text h1 { font-size: 4rem; }
+    .hero-text p { font-size: 1.2rem; }
+    .cta-buttons { justify-content: flex-start; }
+    .hero-animation { 
+        flex: 1;
+        width: 450px;
+        height: 450px;
+    }
+    @keyframes float-orbit { /* Larger orbit for desktop */
+        0% { transform: rotate(0deg) translateX(180px) rotate(0deg); }
+        100% { transform: rotate(360deg) translateX(180px) rotate(-360deg); }
+    }
+    .animated-icon { width: 70px; height: 70px; font-size: 2.5rem;}
+}
+
+
+/* === Features Section (Mobile-First) === */
+.features-section {
+    padding: 4rem 1.5rem;
+    background-color: var(--light-gray);
+    border-top: 1px solid var(--border-color);
+}
+.features-container {
+    max-width: 1280px;
+    margin: auto;
+    text-align: center;
+}
+.section-header {
+    margin-bottom: 3rem;
+}
+.section-header h2 {
+    font-size: 2.2rem; /* Adjusted for mobile */
+    color: var(--secondary-color);
+    margin-bottom: 1rem;
+    font-weight: 700;
+}
+.section-header .subtitle {
+    font-size: 1rem; /* Adjusted for mobile */
+    color: #555;
+    max-width: 700px;
+    margin: 1.5rem auto 0 auto;
+}
+.feature-grid {
+    display: grid;
+    grid-template-columns: 1fr; /* Single column on mobile */
+    gap: 1.5rem;
+}
+.feature-card {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 2rem;
+    text-align: center; /* Center on mobile */
+    border-left: 4px solid var(--primary-color);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.feature-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+}
+.feature-icon {
+    height: 70px; width: 70px;
+    margin: 0 auto 1.5rem auto;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #e6f0ff, #d4e4ff);
+    display: flex; align-items: center; justify-content: center;
+}
+.feature-card i { font-size: 2.8rem; color: var(--primary-color); }
+.feature-card h3 { margin-bottom: 0.75rem; font-size: 1.35rem; color: var(--secondary-color); }
+.feature-card p { color: #555; font-size: 1rem; line-height: 1.7; }
+
+/* === TABLET & DESKTOP LAYOUT for Features === */
+@media (min-width: 768px) {
+    .features-section { padding: 6rem 2rem; }
+    .section-header h2 { font-size: 2.8rem; }
+    .section-header .subtitle { font-size: 1.1rem; }
+    .feature-grid {
+        grid-template-columns: repeat(2, 1fr); /* Two columns on tablets */
+        gap: 2rem;
+    }
+    .feature-card { text-align: left; } /* Align left on larger screens */
+    .feature-icon { margin-left: 0; }
+}
+@media (min-width: 1024px) {
+    .feature-grid {
+        grid-template-columns: repeat(4, 1fr); /* Four columns on desktop */
+    }
+}
+</style>
+
+<!-- Hero Section -->
+<div class="hero-wrapper">
+    <section class="hero">
+        <div class="hero-text">
+            <h1>Automate HR, Elevate <span class="gradient-text">Your People</span></h1>
+            <p>SmartHR combines AI-powered tools for attendance, leave, and recruiting into one seamless platform. Free up your time for what truly matters.</p>
+            <div class="cta-buttons">
+    {% if user.is_authenticated %}
+        <a href="{% url 'dashboard' %}" class="cta-primary">Request a Demo</a>
+    {% else %}
+        <a href="{% url 'login' %}?next=home" class="cta-primary">Request a Demo</a>
+    {% endif %}
+    <a href="#features" class="cta-secondary">Explore Features</a>
+</div>
+
+        </div>
+        <!-- ✨ NEW: Replaces the static image with a dynamic animation -->
+        <div class="hero-animation">
+            <span class="animated-icon icon-1"><i class='bx bxs-user-check'></i></span>
+            <span class="animated-icon icon-2"><i class='bx bxs-calendar-star'></i></span>
+            <span class="animated-icon icon-3"><i class='bx bxs-file-doc'></i></span>
+            <span class="animated-icon icon-4"><i class='bx bxs-conversation'></i></span>
+        </div>
+    </section>
+</div>
+
+<!-- Features Section -->
+<section class="features-section" id="features">
+    <div class="features-container">
+        <div class="section-header">
+            <h2>The All-in-One HR Toolkit</h2>
+            <p class="subtitle">From daily tasks to strategic decisions, SmartHR provides the clarity and automation you need to build a world-class team.</p>
+        </div>
+        <div class="feature-grid">
+            <!-- Feature cards are the same, but the CSS makes them responsive -->
+            <div class="feature-card">
+                <div class="feature-icon"><i class='bx bxs-user-check'></i></div>
+                <h3>Smart Attendance</h3>
+                <p>One-click attendance with geo-tagging and IP restrictions for accurate, effortless time tracking.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><i class='bx bxs-calendar-star'></i></div>
+                <h3>Effortless Leave</h3>
+                <p>A streamlined, role-based approval system for managing all leave requests without the emails.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><i class='bx bxs-file-doc'></i></div>
+                <h3>AI Resume Screening</h3>
+                <p>Our AI analyzes and ranks resumes to find the best-fit candidates, eliminating bias and saving time.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><i class='bx bxs-conversation'></i></div>
+                <h3>Instant HR Assistant</h3>
+                <p>Get immediate answers to policy, leave, or payroll questions from our 24/7 intelligent HR chatbot.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Apply for Leave | SmartHR{% endblock %}
+
+{% block content %}
+<style>
+    /* 
+    =========================================================
+        SmartHR - UNIFIED DESIGN SYSTEM (Apply Leave Page)
+    =========================================================
+    */
+
+    /* --- ✨ Main Layout & Animations --- */
+    .page-container { max-width: 1280px; margin: 0 auto; padding: 2rem 1.5rem; }
+    @media (min-width: 768px) { .page-container { padding: 3rem 2rem; } }
+
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-in-up { animation: fadeInUp 0.6s ease-out forwards; opacity: 0; }
+    
+    .leave-page-grid {
+        display: grid;
+        grid-template-columns: 1fr; /* Mobile-first: single column */
+        gap: 2rem;
+        align-items: flex-start;
+    }
+    @media (min-width: 992px) {
+        .leave-page-grid {
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); /* Two columns on desktop */
+            gap: 3rem;
+        }
+    }
+
+    /* --- ✨ Universal Card Styling --- */
+    .card { background: var(--white); border-radius: 16px; box-shadow: var(--shadow-lg); border: 1px solid var(--border-color); }
+    .card-header { padding: 20px 25px; border-bottom: 1px solid var(--border-color); }
+    .card-header h2 { margin: 0; font-size: 1.2rem; font-weight: 600; color: var(--secondary-color); }
+    .card-content { padding: 30px; }
+
+    /* --- ✨ Universal Button Styling --- */
+    .btn-primary {
+        display: inline-flex; justify-content: center; align-items: center; width: 100%;
+        padding: 15px; border-radius: 30px; border: none; cursor: pointer;
+        background: var(--primary-gradient); color: var(--white); text-decoration: none;
+        font-weight: 600; font-size: 1rem;
+        box-shadow: 0 5px 15px rgba(74, 144, 226, 0.3); transition: all 0.3s ease;
+    }
+    .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(74, 144, 226, 0.4); }
+
+    /* 
+    =========================================================
+        PAGE-SPECIFIC STYLES
+    =========================================================
+    */
+
+    /* --- Left Info Panel --- */
+    .leave-info-panel h1 { font-size: 2.5rem; font-weight: 700; color: var(--secondary-color); }
+    .leave-info-panel .subtitle { color: #555; margin-top: 5px; margin-bottom: 2rem; font-size: 1.1rem; }
+    .illustration-container img { max-width: 350px; width: 100%; height: auto; margin: 1rem auto; display: block; }
+    
+    /* --- ✨ Redesigned Leave Balance Cards --- */
+    .balance-cards-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); /* Responsive grid */
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+    }
+    .balance-card {
+        background: #f9fafb; padding: 20px; border-radius: 12px;
+        border: 1px solid var(--border-color);
+    }
+    .balance-card h4 { margin: 0 0 10px 0; color: var(--secondary-color); font-weight: 600; }
+    .balance-card .days { font-size: 1.8rem; font-weight: 700; color: var(--primary-color); }
+    .progress-bar { height: 8px; background: #e5e7eb; border-radius: 50px; overflow: hidden; margin-top: 15px; }
+    .progress-bar-inner { height: 100%; background: var(--primary-color); border-radius: 50px; }
+
+    /* --- ✨ Aligned Form Styling --- */
+    .form-group { margin-bottom: 25px; position: relative; }
+    .form-group label { display: block; margin-bottom: 8px; font-weight: 500; color: var(--secondary-color); }
+    .form-group input, .form-group select, .form-group textarea {
+        width: 100%;
+        padding: 14px 20px 14px 45px; /* Padding for icon */
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        font-size: 1rem;
+        font-family: 'Poppins', sans-serif;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .form-group textarea { padding: 14px 20px; min-height: 120px; }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+        outline: none; border-color: var(--primary-color);
+        box-shadow: 0 0 0 4px rgba(74, 144, 226, 0.1);
+    }
+    .input-icon { position: absolute; top: 43px; left: 15px; color: #9ca3af; pointer-events: none; font-size: 1.2rem; }
+    
+    #day-count-display {
+        text-align: center; margin: 10px 0 25px 0; padding: 15px;
+        background: #f9faff; border-radius: 8px; font-weight: 500; color: var(--secondary-color);
+        border: 1px solid #eef4ff; transition: opacity 0.3s ease;
+    }
+</style>
+
+<div class="page-container">
+    <div class="leave-page-grid">
+        <!-- LEFT INFORMATION PANEL -->
+        <div class="leave-info-panel fade-in-up">
+            <h1>Apply for Leave</h1>
+            <p class="subtitle">Plan your time off and submit requests with ease.</p>
+            
+            <div class="illustration-container">
+                <img src="{% static 'images/Leave.jpg' %}" alt="Person going on a trip">
+            </div>
+
+            <h3 style="margin-top: 2rem;">Your Leave Balances</h3>
+            <div class="balance-cards-grid">
+                <div class="balance-card">
+                    <h4>Annual Leave</h4>
+                    <div class="days">12 / 20 Days</div>
+                    <div class="progress-bar"><div class="progress-bar-inner" style="width: 60%;"></div></div>
+                </div>
+                <div class="balance-card">
+                    <h4>Sick Leave</h4>
+                    <div class="days">8 / 10 Days</div>
+                    <div class="progress-bar"><div class="progress-bar-inner" style="width: 80%;"></div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT FORM PANEL -->
+        <div class="card fade-in-up" style="animation-delay: 200ms;">
+            <div class="card-header">
+                <h2>New Leave Request</h2>
+            </div>
+            <div class="card-content">
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <div class="form-group">
+                        <label for="{{ form.leave_type.id_for_label }}">Leave Type</label>
+                        <i class='bx bx-category input-icon'></i>
+                        {{ form.leave_type }}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.start_date.id_for_label }}">Start Date</label>
+                        <i class='bx bx-calendar-alt input-icon'></i>
+                        {{ form.start_date }}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ form.end_date.id_for_label }}">End Date</label>
+                        <i class='bx bx-calendar-check input-icon'></i>
+                        {{ form.end_date }}
+                    </div>
+
+                    <div id="day-count-display" style="opacity: 0;">Total Days Requested: <span id="day-count">0</span></div>
+
+                    <div class="form-group">
+                        <label for="{{ form.reason.id_for_label }}">Reason (Optional)</label>
+                        {{ form.reason }}
+                    </div>
+
+                    <button type="submit" class="btn-primary">Submit Request</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript is unchanged and works perfectly -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const startDateInput = document.getElementById('id_start_date');
+    const endDateInput = document.getElementById('id_end_date');
+    const dayCountDisplay = document.getElementById('day-count-display');
+    const dayCountSpan = document.getElementById('day-count');
+
+    function calculateDays() {
+        const startDate = new Date(startDateInput.value);
+        const endDate = new Date(endDateInput.value);
+
+        if (startDateInput.value && endDateInput.value && endDate >= startDate) {
+            const diffTime = Math.abs(endDate - startDate);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+            dayCountSpan.textContent = diffDays;
+            dayCountDisplay.style.opacity = '1';
+        } else {
+            dayCountSpan.textContent = '0';
+            dayCountDisplay.style.opacity = '0';
+        }
+    }
+    startDateInput.addEventListener('change', calculateDays);
+    endDateInput.addEventListener('change', calculateDays);
+});
+</script>
+{% endblock %}
