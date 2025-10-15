@@ -25,7 +25,7 @@ requests==2.32.3
 safetensors==0.4.5
 sqlparse==0.5.3
 sympy==1.13.3
-tokenizers==0.19.1
+tokenizers
 tqdm==4.66.5
 transformers==4.45.2
 typing_extensions==4.12.2
