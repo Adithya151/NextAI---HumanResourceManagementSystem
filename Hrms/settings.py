@@ -27,10 +27,12 @@ DEBUG = False
 
 # Hrms/settings.py
 
+# settings.py
+
 ALLOWED_HOSTS = [
-    "localhost",
-    "127.0.0.1",
-    ".onrender.com",  # Add this for Render
+    'nextai-hr.onrender.com',
+    'localhost',
+    '127.0.0.1',
 ]
 
 # Application definition
