@@ -42,26 +42,20 @@ KNOWLEDGE_BASE = {
 qa_pipeline = None
 
 def _initialize_pipeline():
-    """
-    Loads the heavy transformers pipeline. This is called only once,
-    the first time a user asks a question.
-    """
     global qa_pipeline
-    # Check if it's already loaded to prevent re-loading
     if qa_pipeline is not None:
         return
 
     try:
-        # 2. Import the library *inside* this function, not at the top of the file.
+        # The import MUST be here
         from transformers import pipeline
         
-        logger.info(f"Loading QA model: {MODEL_NAME}...")
-        # This memory-intensive step now happens on the first request, not on startup.
+        logger.info(f"Loading QA model...")
         qa_pipeline = pipeline("question-answering", model=MODEL_NAME)
         logger.info("✅ QA model loaded successfully.")
     except Exception as e:
         logger.error(f"⚠️ Could not load QA model: {e}")
-        qa_pipeline = None # Ensure it stays None if loading fails
+        qa_pipeline = None
 
 def _get_relevant_context(question):
     """
