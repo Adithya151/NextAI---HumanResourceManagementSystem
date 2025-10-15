@@ -1,6 +1,6 @@
 pip==25.1.1
-setuptools==70.0.0
-wheel==0.44.0
+setuptools==68.2.2
+wheel==0.41.3
 asgiref==3.9.2
 certifi==2025.8.3
 charset-normalizer==3.4.3
@@ -18,7 +18,7 @@ mysqlclient==2.2.7
 networkx==3.3
 numpy==2.3.3
 packaging==24.0
-pillow==10.2.0
+pillow
 PyPDF2==3.0.1
 python-decouple==3.8
 python-dotenv==1.0.1
