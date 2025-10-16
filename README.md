@@ -77,3 +77,6 @@ SmartHR/
 ├── .env
 ├── .gitignore
 └── README.md
+
+---
+![Project Logo](https://github.com/Adithya151/NextAI---HumanResourceManagementSystem/blob/main/Screenshot%202025-10-16%20231406.png)
