@@ -49,6 +49,8 @@
 
 ---
 
+<p align="center"> <img src="https://github.com/Adithya151/NextAI---HumanResourceManagementSystem/blob/main/Screenshot%202025-10-16%20231406.png" width="600" alt="Dashboard Screenshot"/> <br><br> <img src="https://github.com/Adithya151/NextAI---HumanResourceManagementSystem/blob/main/Screenshot%202025-10-16%20231432.png" width="600" alt="Employee Management Screenshot"/> </p>
+
 ## 📂 Folder Structure
 
 ```bash
@@ -77,6 +79,3 @@ SmartHR/
 ├── .env
 ├── .gitignore
 └── README.md
-
----
-![Project Logo](https://github.com/Adithya151/NextAI---HumanResourceManagementSystem/blob/main/Screenshot%202025-10-16%20231406.png)
