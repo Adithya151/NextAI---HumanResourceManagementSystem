@@ -1,51 +1,57 @@
-NEXTAI — AI-Driven HR Management System
+<h1 align="center">🤖 NEXTAI — AI-Driven HR Management System</h1>
 
-NEXTAI is an intelligent HR automation web platform built with Django and AI-powered tools.
-It streamlines attendance tracking, leave management, resume screening, and chatbot-based HR support — all in one modern portal.
+<p align="center">
+  NEXTAI is an intelligent HR automation web platform built with <b>Django</b> and <b>AI-powered tools</b>.<br>
+  It streamlines attendance tracking, leave management, resume screening, and chatbot-based HR support — all in one modern portal.
+</p>
 
+---
 
-🚀 Features
+## 🚀 Features
 
-👥 Employee Management
-    Admins and Managers can add, edit, and delete employees.
-    Role-based dashboards (Admin / Manager / Recruiter / Employee).
+### 👥 Employee Management
+- Admins and Managers can add, edit, and delete employees.  
+- Role-based dashboards (Admin / Manager / Recruiter / Employee).
 
-⏰ Attendance System
-    Employees can mark attendance with a single click.
-    Admins can view complete attendance history.
+### ⏰ Attendance System
+- Employees can mark attendance with a single click.  
+- Admins can view complete attendance history.
 
-📝 Leave Management
-    Employees can apply for leave.
-    Managers/Admins can approve or reject leave requests instantly.
+### 📝 Leave Management
+- Employees can apply for leave.  
+- Managers/Admins can approve or reject leave requests instantly.
 
-🤖 AI Resume Screening
-    Recruiters can upload resumes in PDF format.
-    The integrated AI (HuggingFace model) analyzes resumes and scores candidates based on job relevance.
+### 🤖 AI Resume Screening
+- Recruiters can upload resumes in PDF format.  
+- Integrated AI (<b>HuggingFace model</b>) analyzes resumes and scores candidates based on job relevance.
 
-💬 HR Chatbot
-    Smart AI chatbot answers HR-related queries instantly.
-    Powered by NLP to provide policy and payroll responses.
+### 💬 HR Chatbot
+- Smart AI chatbot answers HR-related queries instantly.  
+- Powered by NLP to provide policy and payroll responses.
 
-🔒 Authentication & Security
-    Only registered users can access dashboards.
-    Unauthorized users are redirected to the login page.
-    Secure login/logout system with success messages.
+### 🔒 Authentication & Security
+- Only registered users can access dashboards.  
+- Unauthorized users are redirected to the login page.  
+- Secure login/logout system with success messages.
 
+---
 
-🛠️ Tech Stack
+## 🛠️ Tech Stack
 
-| Layer           | Technology                               |
-| --------------- | ---------------------------------------- |
-| **Frontend**    | HTML5, CSS3, JavaScript, Bootstrap       |
-| **Backend**     | Django 5+, Python 3.12                   |
-| **Database**    | MySQL (via Railway for cloud deployment) |
-| **AI/ML**       | HuggingFace Transformers (DistilBERT)    |
-| **Auth**        | Django Auth System                       |
-| **Environment** | `.env` variables using `python-dotenv`   |
+| **Layer**        | **Technology**                              |
+| ----------------- | ------------------------------------------- |
+| **Frontend**      | HTML5, CSS3, JavaScript, Bootstrap          |
+| **Backend**       | Django 5+, Python 3.12                      |
+| **Database**      | MySQL (via Railway for cloud deployment)    |
+| **AI/ML**         | HuggingFace Transformers (DistilBERT)       |
+| **Auth**          | Django Auth System                          |
+| **Environment**   | `.env` variables using `python-dotenv`      |
 
+---
 
-📂 Folder Structure
+## 📂 Folder Structure
 
+```bash
 SmartHR/
 ├── Hrms/
 │   ├── settings.py
@@ -71,11 +77,3 @@ SmartHR/
 ├── .env
 ├── .gitignore
 └── README.md
-
-
-
-
-
-
-
-
